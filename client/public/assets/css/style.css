@@ -1,0 +1,74 @@
+body{
+    background-color: #323635
+}
+.mylogo{
+    margin-top: 3px;
+    font-size: 35px;
+    font-family: 'Fredoka One', cursive;
+    
+}
+
+.underline{
+    border-bottom: 1px solid grey;
+}
+
+.blue{
+    color: #011627;
+}
+
+.red{
+    color: #9A031E;
+}
+
+.active{
+    background-color: #9A031E;
+}
+
+.question-peek{
+    width: 100%;
+    text-align: center;
+    float: inherit;
+    font-size: 30px;
+    color: whitesmoke;
+    margin-top: 100px;
+    
+}
+
+.answer-buttons{
+    margin-top: 30px;
+}
+
+.question{
+    font-size: 50px;
+    border-bottom: 1px solid grey
+}
+
+.answer-1{
+    display: inline-block;
+    width: 7em;
+    height: 5em;
+    background-color: blue;
+    text-align: center;
+    padding-top: 45px;
+}
+
+.answer-2{
+    display: inline-block;
+    width: 7em;
+    height: 5em;
+    background-color: red;
+    text-align: center;
+    padding-top: 45px;
+}
+
+.adv{
+    height: 400px;
+    background-color: aliceblue;
+    margin-top: 50px;
+}
+
+.author{
+    float: right;
+    margin-right: 70px;
+    font-size: 15px;
+}
