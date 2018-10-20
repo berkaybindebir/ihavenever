@@ -8,23 +8,42 @@ class Question extends Component {
         this.state = {
             id: '',
             question: '',
-            answerTrue: '',
-            answerFalse: '',
-            answered: false
+            answerTrue: 0,
+            answerFalse: 0,
+            answered: false,
+            newQuestion: true,
         };
 
-        this.have = this.have.bind(this);
-        this.never = this.never.bind(this);
-    }
+        this.have = id => {
+            this.setState({answered: true, newQuestion: false})
+            console.log("have")
+            const url = `/api/v1/questions/vote-true/${id}`
+            axios.post(url)
+                .then(res => console.log(res))
+                .then(() => this.calculateAnswers())
+                .catch(err => console.log(err))
+        }
 
-    calculateAnswers() {
-        console.log(this.state.answerTrue)
-        console.log(this.state.answerFalse)
-    }
+        this.never = id => {
+            this.setState({answered: true, newQuestion: false})
+            console.log("never")
+            const url = `/api/v1/questions/vote-false/${id}`
+            axios.post(url)
+                .then(res => console.log(res))
+                .then(() => this.calculateAnswers())
+                .catch(err => console.log(err))
+        }
 
-    componentDidMount() {
-        console.log("did mount")
-        axios.get('/api/v1/questions/')
+            // this.have = () => {
+            //     console.log("Have")
+            // }
+            // this.never = () => {
+            //     console.log("Never")
+            // }
+
+
+        this.getQuestion = () => {
+            axios.get('/api/v1/questions/')
             .then(res => {
                 console.log(res)
                 this.setState({
@@ -32,55 +51,33 @@ class Question extends Component {
                     question: res.data.question, 
                     answerTrue: res.data.answerTrue,
                     answerFalse: res.data.answerFalse,
-                    answered: false, 
+                    answered: false,
+                    newQuestion: true 
                 })
             })
-    }
+        }
 
-    componentDidUpdate(prevProps, prevState){
-        if(this.state.answered === true){
-            console.log("update")
-            this.calculateAnswers()
-            setTimeout(() => {
-                axios.get('/api/v1/questions/')
-                .then(res => {
-                    console.log(res)
-                    this.setState({id: res.data._id, question: res.data.question, answered: false})
-                }, (2000))
+        this.calculateAnswers = () => {
+            const { answerTrue, answerFalse} = this.state
+            const percentHave = parseInt((answerFalse / answerTrue) * 100)
+            const percentNever = 100 - percentHave
+            console.log("Have:" + percentHave + "Never" + percentNever)
+            this.setState({
+                answerTrue: percentHave,
+                answerFalse: percentNever
             })
         }
+
+        
     }
 
+    componentDidMount() {
+        console.log("did mount")
+        this.getQuestion()
 
-
-    have(id){
-        return () => {
-            const url = `/api/v1/questions/vote-true/${id}`
-            this.setState({answered: true})
-            axios.post(url)
-                .then(res => console.log(res))
-                .catch(err => console.log(err))
-        }
     }
+    
 
-    never(id){
-        return () => {
-            this.setState({answered: true})
-            const url = `/api/v1/questions/vote-false/${id}`
-            axios.post(url)
-                .then(res => console.log(res))
-                .catch(err => console.log(err))
-        }
-    }
-
-    // have = e => {
-    //     console.log("Have")
-    // }
-
-
-    // never = e => {
-    //     console.log("Never")
-    // }
 
     render(){
         return(
@@ -90,8 +87,26 @@ class Question extends Component {
                 <div className="question-peek">
                     <span className="question"> Never Have I Ever {this.state.question}</span>
                     <div className="answer-buttons">
-                      <button className="answer-1 shadow rounded" onClick={this.have(this.state.id)}><span>I HAVE</span></button>
-                      <button className="answer-2 shadow rounded" onClick={this.never(this.state.id)}><span>I NEVER</span></button>
+                      <button className="answer-1 shadow rounded" onClick={this.have.bind(this, this.state.id)}>
+                      <span className="text-centering">
+                            {
+                                this.state.newQuestion && <span className="text-centering"> I HAVE </span>
+                            }
+                            {
+                                !this.state.newQuestion && this.state.answerTrue
+                            }
+                      </span>
+                      </button>
+                      <button className="answer-2 shadow rounded" onClick={this.never.bind(this, this.state.id)}>
+                      <span className="text-centering">
+                            {
+                                this.state.newQuestion && <span className="text-centering"> I NEVER </span>
+                            }
+                            {
+                                !this.state.newQuestion && this.state.answerFalse
+                            }
+                      </span>
+                      </button>
                     </div>
                     <span className="author"> Author</span>
                 </div>
@@ -99,6 +114,16 @@ class Question extends Component {
           <div className="col-md-2 "></div>
             </div>   
         )
+    }
+
+
+    componentDidUpdate(prevProps, prevState, snapshot){
+        if(this.state.answered !== false){
+        console.log("did update")
+        setTimeout(() => {
+            this.getQuestion()
+        }, 3000)
+        }
     }
 }
 
